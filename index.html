@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Control Web</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <div class="topbar card">
+          <div class="topbar-copy">
+            <p class="eyebrow">Live show toolkit</p>
+            <h1>Event Control Web</h1>
+            <p id="page-subtitle" class="small muted">Live event control for phone and laptop.</p>
+          </div>
+          <div class="topbar-meta">
+            <div>
+              <p class="small muted">Page</p>
+              <h2 id="page-title">Dashboard</h2>
+            </div>
+            <div class="status-group">
+              <span id="auth-badge" class="badge badge-muted">Signed out</span>
+              <span id="status-display" class="status-pill">Signed out</span>
+              <span id="live-sync-pill" class="status-pill accent-pill">Waiting</span>
+              <span id="event-sync-badge" class="badge badge-muted">Offline</span>
+            </div>
+            <button
+              id="mobile-menu-button"
+              class="icon-button mobile-menu-button hidden"
+              type="button"
+              aria-label="Open navigation menu"
+              aria-controls="mobile-nav-overlay"
+              aria-expanded="false"
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+            <button id="sign-out-btn" class="danger hidden" type="button">Sign Out</button>
+          </div>
+        </div>
+
+        <nav class="top-nav card" aria-label="Main tabs">
+          <button class="tab-button active" data-tab="dashboard" type="button">Dashboard</button>
+          <button class="tab-button" data-tab="program" type="button">Program</button>
+          <button class="tab-button" data-tab="songs" type="button">Songs</button>
+          <button class="tab-button" data-tab="checklist" type="button">Checklist</button>
+          <button class="tab-button" data-tab="notes" type="button">Notes</button>
+        </nav>
+
+        <div id="mobile-nav-overlay" class="mobile-nav-overlay hidden" aria-hidden="true">
+          <div class="mobile-nav-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
+            <div class="mobile-nav-header">
+              <p class="section-kicker">Navigate</p>
+              <button id="mobile-menu-close-btn" class="icon-button" type="button" aria-label="Close navigation menu">×</button>
+            </div>
+            <div class="mobile-nav-list">
+              <button class="mobile-nav-link" data-tab="dashboard" type="button">Dashboard</button>
+              <button class="mobile-nav-link" data-tab="program" type="button">Program</button>
+              <button class="mobile-nav-link" data-tab="songs" type="button">Songs</button>
+              <button class="mobile-nav-link" data-tab="checklist" type="button">Checklist</button>
+              <button class="mobile-nav-link" data-tab="notes" type="button">Notes</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-panel">
+        <section class="utility-grid">
+          <section class="card auth-card">
+            <div class="section-title compact-title">
+              <div>
+                <p class="section-kicker">Account</p>
+                <h3>Operator Login</h3>
+              </div>
+            </div>
+
+            <div class="form-stack">
+              <label>
+                <span>Email</span>
+                <input id="email" type="email" placeholder="operator@example.com" />
+              </label>
+
+              <label>
+                <span>Password</span>
+                <input id="password" type="password" placeholder="Minimum 6 characters" />
+              </label>
+
+              <button id="forgot-password-btn" class="text-button" type="button">Forgot password?</button>
+
+              <div class="button-stack">
+                <button id="create-account-btn" class="primary" type="button">Create Account</button>
+                <button id="sign-in-btn" type="button">Sign In</button>
+              </div>
+            </div>
+
+            <div class="status-panel">
+              <p class="small"><strong>User</strong> <span id="user-email">Not signed in</span></p>
+              <p id="auth-message" class="muted">Enter your Firebase email and password to connect.</p>
+            </div>
+          </section>
+
+          <section class="card event-card">
+            <div class="section-title compact-title">
+              <div>
+                <p class="section-kicker">Current Show</p>
+                <h3>Active Event</h3>
+              </div>
+            </div>
+
+            <div class="event-status">
+              <p class="event-name" id="active-event-title">Not loaded</p>
+              <p class="small muted">Updated <span id="active-event-updated">No event selected</span></p>
+            </div>
+
+            <div class="event-inline-form">
+              <input id="active-event-title-input" type="text" placeholder="Event title" />
+              <div class="inline-actions">
+                <button id="rename-event-btn" class="primary" type="button">Rename</button>
+                <button id="new-event-btn" class="ghost" type="button">New Event</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="dashboard" class="page active">
+          <div class="stats-grid">
+            <article class="card stat-card feature-card">
+              <p class="stat-label">Active Event</p>
+              <strong id="dashboard-event-title">None</strong>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Program</p>
+              <strong id="dashboard-program-count">0</strong>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Songs</p>
+              <strong id="dashboard-song-count">0</strong>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Missing Songs</p>
+              <strong id="dashboard-missing-songs">0</strong>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Checklist Open</p>
+              <strong id="dashboard-incomplete-checklist">0</strong>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Notes</p>
+              <strong id="dashboard-notes-count">0</strong>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="card">
+              <div class="section-title compact-title">
+                <div>
+                  <p class="section-kicker">Fast Access</p>
+                  <h3>Quick Actions</h3>
+                </div>
+              </div>
+              <div class="quick-actions-grid">
+                <button id="quick-add-program" class="primary" type="button">Add Program Item</button>
+                <button id="quick-add-song" type="button">Add Song</button>
+                <button id="quick-add-checklist" type="button">Add Checklist Item</button>
+                <button id="quick-add-note" type="button">Add Note</button>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="section-title compact-title">
+                <div>
+                  <p class="section-kicker">Overview</p>
+                  <h3>Live Summary</h3>
+                </div>
+                <button id="dashboard-details-toggle" class="ghost compact-toggle" type="button" aria-expanded="false">
+                  Details
+                </button>
+              </div>
+              <div id="dashboard-summary-details" class="summary-stack hidden">
+                <div class="summary-row">
+                  <span>Last updated</span>
+                  <strong id="dashboard-last-updated">Not available</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Ready program items</span>
+                  <strong id="dashboard-ready-program">0</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Done program items</span>
+                  <strong id="dashboard-done-program">0</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Approved songs</span>
+                  <strong id="dashboard-approved-songs">0</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Pinned notes</span>
+                  <strong id="dashboard-pinned-notes">0</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="program" class="page">
+          <article class="card section-shell">
+            <div class="section-title section-toolbar compact-title">
+              <div>
+                <p class="section-kicker">Running Order</p>
+                <h3>Program</h3>
+              </div>
+              <div class="toolbar-actions">
+                <input id="program-search" type="search" placeholder="Search program" />
+                <select id="program-filter">
+                  <option value="all">All statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="ready">Ready</option>
+                  <option value="done">Done</option>
+                </select>
+                <button id="program-undo-btn" class="undo-button" type="button" disabled>Undo</button>
+                <button id="add-program-btn" class="primary" type="button">Add Program Item</button>
+              </div>
+            </div>
+            <div id="program-list" class="entity-list"></div>
+          </article>
+        </section>
+
+        <section id="songs" class="page">
+          <article class="card section-shell">
+            <div class="section-title section-toolbar compact-title">
+              <div>
+                <p class="section-kicker">Music Files</p>
+                <h3>Songs</h3>
+              </div>
+              <div class="toolbar-actions">
+                <input id="songs-search" type="search" placeholder="Search songs" />
+                <select id="songs-filter">
+                  <option value="all">All songs</option>
+                  <option value="missing">Missing files</option>
+                  <option value="approved">Approved</option>
+                  <option value="backup-missing">Backup missing</option>
+                </select>
+                <button id="songs-undo-btn" class="undo-button" type="button" disabled>Undo</button>
+                <button id="add-song-btn" class="primary" type="button">Add Song</button>
+              </div>
+            </div>
+            <div id="songs-list" class="entity-list"></div>
+          </article>
+        </section>
+
+        <section id="checklist" class="page">
+          <article class="card section-shell">
+            <div class="section-title section-toolbar compact-title">
+              <div>
+                <p class="section-kicker">Show Prep</p>
+                <h3>Checklist</h3>
+              </div>
+              <div class="toolbar-actions">
+                <select id="checklist-filter">
+                  <option value="all">All items</option>
+                  <option value="incomplete">Incomplete</option>
+                  <option value="checked">Checked</option>
+                  <option value="critical">Critical</option>
+                </select>
+                <button id="checklist-undo-btn" class="undo-button" type="button" disabled>Undo</button>
+                <button id="add-checklist-btn" class="primary" type="button">Add Checklist Item</button>
+              </div>
+            </div>
+            <div id="checklist-list" class="entity-list checklist-groups"></div>
+          </article>
+        </section>
+
+        <section id="notes" class="page">
+          <article class="card section-shell">
+            <div class="section-title section-toolbar compact-title">
+              <div>
+                <p class="section-kicker">Live Notes</p>
+                <h3>Notes</h3>
+              </div>
+              <div class="toolbar-actions">
+                <select id="notes-filter">
+                  <option value="all">All notes</option>
+                  <option value="general">General</option>
+                  <option value="sound">Sound</option>
+                  <option value="urgent">Urgent</option>
+                  <option value="reminder">Reminder</option>
+                </select>
+                <button id="notes-undo-btn" class="undo-button" type="button" disabled>Undo</button>
+                <button id="add-note-btn" class="primary" type="button">Add Note</button>
+              </div>
+            </div>
+            <div id="notes-list" class="entity-list"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay hidden" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="section-title compact-title">
+          <div>
+            <p class="section-kicker">Edit</p>
+            <h3 id="modal-title">Edit Item</h3>
+          </div>
+          <button id="modal-close-btn" class="icon-button" type="button" aria-label="Close">×</button>
+        </div>
+        <form id="item-form" class="modal-form"></form>
+      </div>
+    </div>
+
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
