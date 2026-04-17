@@ -193,6 +193,11 @@ label span,
   max-width: 1500px;
   margin: 0 auto;
   padding: 1rem;
+  overflow: visible;
+  transform: none;
+  filter: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .app-header {
@@ -771,6 +776,11 @@ body:has(#mobile-nav-overlay:not(.hidden)) .app-header {
   display: grid;
   gap: 1rem;
   padding: 0 0 2rem;
+  overflow: visible;
+  transform: none;
+  filter: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .utility-grid {
@@ -808,6 +818,21 @@ body:has(#mobile-nav-overlay:not(.hidden)) .app-header {
 
 .section-toolbar {
   margin-bottom: 1rem;
+}
+
+#checklist .section-toolbar {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 6.2rem;
+  z-index: 18;
+  margin-bottom: 1rem;
+  padding: 0.35rem 0 0.55rem;
+  background: linear-gradient(
+    180deg,
+    rgba(243, 246, 251, 0.98) 0%,
+    rgba(243, 246, 251, 0.94) 78%,
+    rgba(243, 246, 251, 0) 100%
+  );
 }
 
 .toolbar-actions {
@@ -928,6 +953,11 @@ body:has(#mobile-nav-overlay:not(.hidden)) .app-header {
 
 .page {
   display: none;
+  overflow: visible;
+  transform: none;
+  filter: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .page.active {
@@ -1240,6 +1270,52 @@ body:has(#sign-out-btn:not(.hidden)) .topbar-copy h1 {
     padding: 1rem;
   }
 
+  .topbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.55rem;
+  }
+
+  .topbar-copy {
+    min-width: 0;
+    gap: 0.05rem;
+  }
+
+  .topbar-copy h1 {
+    font-size: 1rem;
+    line-height: 1.15;
+  }
+
+  .topbar-meta {
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+  }
+
+  .topbar-meta .badge {
+    display: none;
+  }
+
+  #sign-out-btn {
+    min-height: 40px;
+    padding: 0.6rem 0.85rem;
+  }
+
+  .mobile-menu-button {
+    width: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0.28rem;
+    border-radius: 12px;
+  }
+
+  .mobile-menu-button span {
+    width: 16px;
+  }
+
   .tab-button {
     min-height: 42px;
     padding: 0.7rem 0.85rem;
@@ -1283,9 +1359,17 @@ body:has(#sign-out-btn:not(.hidden)) .topbar-copy h1 {
     flex: 1 1 140px;
   }
 
+  #checklist .section-toolbar {
+    top: 4.35rem;
+    margin-bottom: 0.75rem;
+    padding: 0.3rem 0 0.45rem;
+  }
+
   .toolbar-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(96px, 0.8fr) minmax(0, 1.2fr);
+    gap: 0.45rem;
+    align-items: stretch;
   }
 
   .toolbar-actions input,
@@ -1296,6 +1380,39 @@ body:has(#sign-out-btn:not(.hidden)) .topbar-copy h1 {
   .undo-button,
   .toolbar-actions .primary {
     width: 100%;
+  }
+
+  .undo-button,
+  .toolbar-actions button {
+    min-height: 38px;
+    padding: 0.58rem 0.72rem;
+    font-size: 0.88rem;
+    line-height: 1.2;
+  }
+
+  .undo-button {
+    justify-self: stretch;
+    font-weight: 700;
+  }
+
+  .toolbar-actions .primary {
+    white-space: nowrap;
+  }
+
+  .entity-card {
+    padding: 0.9rem;
+    gap: 0.8rem;
+  }
+
+  .card-primary-actions {
+    gap: 0.45rem;
+  }
+
+  .card-primary-actions button {
+    min-height: 34px;
+    padding: 0.5rem 0.68rem;
+    font-size: 0.82rem;
+    line-height: 1.15;
   }
 
   .drag-handle {
