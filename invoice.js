@@ -40,6 +40,12 @@ const elements = {
   printBtn: document.querySelector("#print-btn"),
   copyZelleBtn: document.querySelector("#copy-zelle-btn"),
   copyLinkBtn: document.querySelector("#copy-link-btn"),
+  subtotalRow: document.querySelector("#subtotal-row"),
+  totalRow: document.querySelector("#total-row"),
+  invoiceTotalRow: document.querySelector("#invoice-total-row"),
+  invoiceTotal: document.querySelector("#invoice-total"),
+  notesSection: document.querySelector("#notes-section"),
+  detailGridSection: document.querySelector("#detail-grid-section"),
 };
 
 function formatMoney(value) {
@@ -113,13 +119,13 @@ function renderLineItems(invoice) {
     .map(
       (item) => `
         <tr>
-          <td>
+          <td data-label="Item / Service">
             <strong>${escapeHtml(item.description || "Item")}</strong>
             ${item.details ? `<span>${escapeHtml(item.details)}</span>` : ""}
           </td>
-          <td>${escapeHtml(item.quantity)}</td>
-          <td>${escapeHtml(formatMoney(item.unitPrice))}</td>
-          <td>${escapeHtml(formatMoney(item.amount))}</td>
+          <td data-label="Quantity">${escapeHtml(item.quantity)}</td>
+          <td data-label="Price">${escapeHtml(formatMoney(item.unitPrice))}</td>
+          <td data-label="Amount">${escapeHtml(formatMoney(item.amount))}</td>
         </tr>
       `
     )
@@ -163,6 +169,17 @@ function renderInvoice(invoice, paymentSettings = null) {
   setText("taxAmount", formatMoney(invoice.taxAmount));
   setText("depositPaid", formatMoney(invoice.depositPaid));
   setText("balanceDue", formatMoney(invoice.balanceDue));
+
+  // Simplified financial view when no tax, discounts, or additional fees
+  const taxAmountVal = roundCurrency(invoice.taxAmount);
+  const discountsVal = roundCurrency(invoice.discounts || 0);
+  const additionalFeesVal = roundCurrency(invoice.additionalFees || 0);
+  const simplified = taxAmountVal === 0 && discountsVal === 0 && additionalFeesVal === 0;
+  elements.invoiceTotal.textContent = formatMoney(invoice.total || invoice.subtotal);
+  elements.subtotalRow.classList.toggle("hidden", simplified);
+  elements.totalRow.classList.toggle("hidden", simplified);
+  elements.invoiceTotalRow.classList.toggle("hidden", !simplified);
+
   const hasZelle = Boolean(zelleEmail);
   elements.zellePaymentSection.classList.toggle("hidden", !hasZelle);
   elements.paymentFallback.classList.toggle("hidden", hasZelle);
@@ -173,13 +190,20 @@ function renderInvoice(invoice, paymentSettings = null) {
   }
   elements.paymentInstructions.textContent = extraPaymentInstructions;
   elements.paymentInstructions.classList.toggle("hidden", !extraPaymentInstructions);
-  setText("invoiceNotes", invoice.notes || "No notes.");
+
+  const hasNotes = Boolean(invoice.notes && String(invoice.notes).trim());
+  elements.notesSection.classList.toggle("hidden", !hasNotes);
+  if (hasNotes) {
+    elements.invoiceNotes.textContent = invoice.notes;
+  }
   setText("invoiceFooterMessage", invoice.invoiceFooterMessage || APP_CONFIG.invoiceFooterMessage || "");
   renderLineItems(invoice);
 
+  const hideTaxRows = !showTax || simplified;
   [elements.taxRateRow, elements.taxAmountRow, elements.taxableSubtotalRow].forEach((element) => {
-    element.classList.toggle("hidden", !showTax);
+    element.classList.toggle("hidden", hideTaxRows);
   });
+  elements.detailGridSection.classList.toggle("hidden", hideTaxRows);
 
   if (invoice.invoiceLogoUrl) {
     elements.invoiceLogo.src = invoice.invoiceLogoUrl;

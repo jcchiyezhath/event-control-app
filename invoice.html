@@ -10,7 +10,7 @@
     <main class="invoice-page">
       <section id="invoice-card" class="invoice-card">
         <div class="invoice-header">
-          <div>
+          <div class="brand-col">
             <div class="brand-row">
               <img id="invoice-logo" class="invoice-logo hidden" alt="" />
               <div>
@@ -22,7 +22,7 @@
           <div class="invoice-number-block">
             <p class="eyebrow">Invoice</p>
             <strong id="invoice-number">Loading</strong>
-            <span id="invoice-status"></span>
+            <span id="invoice-status" class="status-badge"></span>
           </div>
         </div>
 
@@ -63,7 +63,7 @@
             </table>
           </section>
 
-          <section class="detail-grid">
+          <section id="detail-grid-section" class="detail-grid">
             <article id="taxable-subtotal-row">
               <span>Taxable Subtotal</span>
               <strong id="taxable-subtotal"></strong>
@@ -71,7 +71,7 @@
           </section>
 
           <section class="totals-section">
-            <div class="total-row">
+            <div id="subtotal-row" class="total-row">
               <span>Subtotal</span>
               <strong id="subtotal"></strong>
             </div>
@@ -83,9 +83,13 @@
               <span>Tax Amount</span>
               <strong id="tax-amount"></strong>
             </div>
-            <div class="total-row">
+            <div id="total-row" class="total-row">
               <span>Total</span>
               <strong id="total"></strong>
+            </div>
+            <div id="invoice-total-row" class="total-row hidden">
+              <span>Invoice Total</span>
+              <strong id="invoice-total"></strong>
             </div>
             <div class="total-row">
               <span>Deposit Paid</span>
@@ -97,23 +101,31 @@
             </div>
           </section>
 
-          <section class="content-section">
-            <h2>Payment Options</h2>
-            <div id="zelle-payment-section">
-              <p><strong>Zelle:</strong> <span id="zelle-email"></span></p>
-              <p id="zelle-memo-instruction"></p>
+          <section class="content-section payment-section">
+            <h2>Payment Method</h2>
+            <div id="zelle-payment-section" class="payment-method-block hidden">
+              <div class="payment-method-name">Zelle</div>
+              <div class="payment-method-detail">
+                <span class="payment-label">Email</span>
+                <span id="zelle-email" class="payment-value"></span>
+              </div>
+              <div class="payment-method-detail">
+                <span class="payment-label">Memo</span>
+                <span id="zelle-memo-instruction" class="payment-value"></span>
+              </div>
             </div>
             <p id="payment-fallback" class="hidden">Payment details will be provided by the organizer.</p>
-            <p id="payment-instructions"></p>
-            <p class="small muted">Additional payment methods may be added in the future.</p>
+            <p id="payment-instructions" class="hidden"></p>
           </section>
 
-          <section class="content-section">
+          <section id="notes-section" class="content-section hidden">
             <h2>Notes</h2>
             <p id="invoice-notes"></p>
           </section>
 
-          <p id="invoice-footer-message" class="invoice-footer-message"></p>
+          <footer class="invoice-footer">
+            <p id="invoice-footer-message" class="invoice-footer-message"></p>
+          </footer>
 
           <div class="invoice-actions">
             <button id="print-btn" class="primary" type="button">Download PDF / Print</button>
