@@ -1666,6 +1666,10 @@ document.addEventListener("DOMContentLoaded", () => {
       state.invoiceSettings = normalizeInvoiceSettings(payload);
       renderInvoiceSettingsForm();
       showToast("Invoice settings saved", "success");
+      const published = state.invoices.filter((inv) => inv.publicToken);
+      if (published.length) {
+        Promise.all(published.map((inv) => syncPublicInvoice(inv))).catch(() => {});
+      }
     } catch (error) {
       showToast(mapFirebaseError(error), "error");
     }
@@ -2272,6 +2276,7 @@ document.addEventListener("DOMContentLoaded", () => {
       zelleEmail: settings.zelleEmail,
       invoiceFooterMessage: settings.invoiceFooterMessage,
       countryStateDisplay: settings.countryStateDisplay,
+      ownerUid: state.user?.uid || "",
       paymentMethodsPlaceholder: true,
       updatedAt: serverTimestamp(),
     };

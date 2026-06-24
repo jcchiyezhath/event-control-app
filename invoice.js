@@ -2,6 +2,10 @@ import { db } from "./firebase-config.js";
 import { APP_CONFIG } from "./app-config.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+function invoiceSettingsRef(uid) {
+  return doc(db, "users", uid, "settings", "invoice");
+}
+
 const elements = {
   businessName: document.querySelector("#business-name"),
   invoiceLogo: document.querySelector("#invoice-logo"),
@@ -25,8 +29,10 @@ const elements = {
   taxAmount: document.querySelector("#tax-amount"),
   depositPaid: document.querySelector("#deposit-paid"),
   balanceDue: document.querySelector("#balance-due"),
+  zellePaymentSection: document.querySelector("#zelle-payment-section"),
   zelleEmail: document.querySelector("#zelle-email"),
   zelleMemoInstruction: document.querySelector("#zelle-memo-instruction"),
+  paymentFallback: document.querySelector("#payment-fallback"),
   paymentInstructions: document.querySelector("#payment-instructions"),
   invoiceNotes: document.querySelector("#invoice-notes"),
   invoiceFooterMessage: document.querySelector("#invoice-footer-message"),
@@ -133,15 +139,12 @@ async function copyText(text, button, label) {
   }
 }
 
-function renderInvoice(invoice) {
-  const zelleEmail = invoice.zelleEmail || APP_CONFIG.invoiceZelleEmail || "";
+function renderInvoice(invoice, paymentSettings = null) {
+  const zelleEmail = (paymentSettings && paymentSettings.zelleEmail) || invoice.zelleEmail || "";
+  const memoInstruction = (paymentSettings && paymentSettings.paymentInstructions) || invoice.paymentInstructions || APP_CONFIG.invoicePaymentInstructions || "";
   const businessName = invoice.businessName || APP_CONFIG.invoiceBusinessName;
   const showTax = invoice.showTaxOnInvoice !== false;
-  const defaultMemoInstruction = APP_CONFIG.invoicePaymentInstructions || "";
-  const extraPaymentInstructions =
-    String(invoice.paymentInstructions || "").trim() === defaultMemoInstruction
-      ? ""
-      : String(invoice.paymentInstructions || "").trim();
+  const extraPaymentInstructions = "";
 
   document.title = `Invoice | ${businessName}`;
   setText("businessName", businessName);
@@ -160,8 +163,14 @@ function renderInvoice(invoice) {
   setText("taxAmount", formatMoney(invoice.taxAmount));
   setText("depositPaid", formatMoney(invoice.depositPaid));
   setText("balanceDue", formatMoney(invoice.balanceDue));
-  setText("zelleEmail", zelleEmail);
-  setText("zelleMemoInstruction", defaultMemoInstruction);
+  const hasZelle = Boolean(zelleEmail);
+  elements.zellePaymentSection.classList.toggle("hidden", !hasZelle);
+  elements.paymentFallback.classList.toggle("hidden", hasZelle);
+  elements.copyZelleBtn.classList.toggle("hidden", !hasZelle);
+  if (hasZelle) {
+    setText("zelleEmail", zelleEmail);
+    setText("zelleMemoInstruction", memoInstruction);
+  }
   elements.paymentInstructions.textContent = extraPaymentInstructions;
   elements.paymentInstructions.classList.toggle("hidden", !extraPaymentInstructions);
   setText("invoiceNotes", invoice.notes || "No notes.");
@@ -177,7 +186,9 @@ function renderInvoice(invoice) {
     elements.invoiceLogo.classList.remove("hidden");
   }
 
-  elements.copyZelleBtn.addEventListener("click", () => copyText(zelleEmail, elements.copyZelleBtn, "Zelle Email Copied"));
+  if (hasZelle) {
+    elements.copyZelleBtn.addEventListener("click", () => copyText(zelleEmail, elements.copyZelleBtn, "Zelle Email Copied"));
+  }
   elements.copyLinkBtn.addEventListener("click", () => copyText(window.location.href, elements.copyLinkBtn, "Invoice Link Copied"));
   elements.printBtn.addEventListener("click", () => window.print());
 
@@ -200,7 +211,20 @@ async function loadInvoice() {
       return;
     }
 
-    renderInvoice(snapshot.data());
+    const invoice = snapshot.data();
+    let paymentSettings = null;
+    if (invoice.ownerUid) {
+      try {
+        const settingsSnap = await getDoc(invoiceSettingsRef(invoice.ownerUid));
+        if (settingsSnap.exists()) {
+          paymentSettings = settingsSnap.data();
+        }
+      } catch {
+        // Settings unavailable — invoice-stored values used as fallback
+      }
+    }
+
+    renderInvoice(invoice, paymentSettings);
   } catch (error) {
     console.error("Unable to load invoice", error);
     elements.statusMessage.textContent = "Unable to load this invoice.";
