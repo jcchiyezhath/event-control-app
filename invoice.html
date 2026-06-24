@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice</title>
+    <link rel="stylesheet" href="./invoice.css" />
+  </head>
+  <body>
+    <main class="invoice-page">
+      <section id="invoice-card" class="invoice-card">
+        <div class="invoice-header">
+          <div>
+            <div class="brand-row">
+              <img id="invoice-logo" class="invoice-logo hidden" alt="" />
+              <div>
+                <p id="country-state-display" class="eyebrow">United States</p>
+                <h1 id="business-name">Invoice</h1>
+              </div>
+            </div>
+          </div>
+          <div class="invoice-number-block">
+            <p class="eyebrow">Invoice</p>
+            <strong id="invoice-number">Loading</strong>
+            <span id="invoice-status"></span>
+          </div>
+        </div>
+
+        <div id="invoice-status-message" class="status-message">Loading invoice...</div>
+
+        <div id="invoice-content" class="invoice-content hidden">
+          <section class="invoice-meta-grid">
+            <article class="bill-to">
+              <span>Bill To</span>
+              <strong id="client-name"></strong>
+              <p id="event-title"></p>
+            </article>
+            <article>
+              <span>Invoice Date</span>
+              <strong id="invoice-date"></strong>
+            </article>
+            <article>
+              <span>Due Date</span>
+              <strong id="due-date"></strong>
+            </article>
+            <article class="payment-due">
+              <span>Payment Due</span>
+              <strong id="payment-due"></strong>
+            </article>
+          </section>
+
+          <section class="items-section">
+            <table class="invoice-table">
+              <thead>
+                <tr>
+                  <th>Item / Service</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="line-items-body"></tbody>
+            </table>
+          </section>
+
+          <section class="detail-grid">
+            <article id="taxable-subtotal-row">
+              <span>Taxable Subtotal</span>
+              <strong id="taxable-subtotal"></strong>
+            </article>
+          </section>
+
+          <section class="totals-section">
+            <div class="total-row">
+              <span>Subtotal</span>
+              <strong id="subtotal"></strong>
+            </div>
+            <div id="tax-rate-row" class="total-row">
+              <span>Tax Rate</span>
+              <strong id="tax-rate"></strong>
+            </div>
+            <div id="tax-amount-row" class="total-row">
+              <span>Tax Amount</span>
+              <strong id="tax-amount"></strong>
+            </div>
+            <div class="total-row">
+              <span>Total</span>
+              <strong id="total"></strong>
+            </div>
+            <div class="total-row">
+              <span>Deposit Paid</span>
+              <strong id="deposit-paid"></strong>
+            </div>
+            <div class="total-row balance-row">
+              <span>Balance Due</span>
+              <strong id="balance-due"></strong>
+            </div>
+          </section>
+
+          <section class="content-section">
+            <h2>Payment Options</h2>
+            <p><strong>Zelle:</strong> <span id="zelle-email"></span></p>
+            <p id="zelle-memo-instruction"></p>
+            <p id="payment-instructions"></p>
+            <p class="small muted">Additional payment methods may be added in the future.</p>
+          </section>
+
+          <section class="content-section">
+            <h2>Notes</h2>
+            <p id="invoice-notes"></p>
+          </section>
+
+          <p id="invoice-footer-message" class="invoice-footer-message"></p>
+
+          <div class="invoice-actions">
+            <button id="print-btn" class="primary" type="button">Download PDF / Print</button>
+            <button id="copy-zelle-btn" type="button">Copy Zelle Email</button>
+            <button id="copy-link-btn" type="button">Copy Invoice Link</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./invoice.js"></script>
+  </body>
+</html>

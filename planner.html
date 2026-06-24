@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Program Planner</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="request-page">
+    <main class="public-request-shell">
+      <section class="card public-request-card public-planner-card">
+        <div class="section-title compact-title">
+          <div>
+            <p class="section-kicker">Client Planner</p>
+            <h1>Program Planner</h1>
+            <p id="planner-event-title" class="small muted">Loading event...</p>
+          </div>
+        </div>
+        <p class="planner-intro">
+          Welcome! Use this planner to share your event program with us. Just tell us what you'd like to happen —
+          in the order you'd like it. No exact times needed. We'll take care of the rest.
+        </p>
+
+        <section class="planner-share-section" aria-labelledby="planner-share-title">
+          <div class="section-title compact-title">
+            <div>
+              <p class="section-kicker">Start Here</p>
+              <h2 id="planner-share-title">How would you like to share your program?</h2>
+            </div>
+          </div>
+          <div class="planner-method-grid" role="tablist" aria-label="Program sharing method">
+            <button class="planner-method-card active" type="button" data-planner-method="type" role="tab" aria-selected="true">
+              <strong>Type it in</strong>
+              <span>Build your program one activity at a time. Great for planning as you go.</span>
+            </button>
+            <button class="planner-method-card" type="button" data-planner-method="upload" role="tab" aria-selected="false">
+              <strong>Upload a file</strong>
+              <span>Already have a program written? Send us your document, spreadsheet, or a photo.</span>
+            </button>
+            <button class="planner-method-card" type="button" data-planner-method="paste" role="tab" aria-selected="false">
+              <strong>Paste text</strong>
+              <span>Paste from a notes app or email — we'll turn it into a structured activity list.</span>
+            </button>
+          </div>
+        </section>
+
+        <form id="planner-form" class="form-stack planner-method-panel" data-method-panel="type">
+          <div class="quick-add-section">
+            <p class="quick-add-label small">Common Birthday Activities — tap to fill in:</p>
+            <div class="quick-add-strip" aria-label="Quick add activity">
+              <button type="button" data-quick-activity="Guest Arrival" data-duration="20 minutes">Guest Arrival</button>
+              <button type="button" data-quick-activity="Welcome Speech" data-duration="5 minutes">Welcome Speech</button>
+              <button type="button" data-quick-activity="Cake Cutting" data-duration="10 minutes">Cake Cutting</button>
+              <button type="button" data-quick-activity="Birthday Song" data-duration="5 minutes">Birthday Song</button>
+              <button type="button" data-quick-activity="Dinner" data-duration="45 minutes">Dinner</button>
+              <button type="button" data-quick-activity="Family Photos" data-duration="15 minutes">Family Photos</button>
+              <button type="button" data-quick-activity="Open Dancing" data-duration="60 minutes">Open Dancing</button>
+            </div>
+          </div>
+          <div class="planner-example-panel">
+            <p class="small planner-example-title">Sample event flow:</p>
+            <ol class="planner-example-list small muted">
+              <li>Guest Arrival</li>
+              <li>Welcome Speech</li>
+              <li>Cake Cutting</li>
+              <li>Dinner</li>
+              <li>Family Photos</li>
+              <li>Open Dancing</li>
+            </ol>
+          </div>
+          <p class="small muted planner-order-hint">Add activities in the order they'll happen. No exact times needed — an estimate is fine.</p>
+          <div class="form-grid">
+            <label>
+              <span>What would you like to happen?</span>
+              <input name="activityName" maxlength="140" required autocomplete="off" placeholder="Example: Cake Cutting" />
+            </label>
+            <label>
+              <span>Approximate time needed</span>
+              <input name="duration" maxlength="40" placeholder="Example: 10 minutes" autocomplete="off" />
+            </label>
+            <label class="full-span">
+              <span>Notes for DJ or Event Host</span>
+              <textarea name="notes" maxlength="700" placeholder="Example: Please gather family near the cake table before cutting"></textarea>
+            </label>
+            <label>
+              <span>Song for this activity (optional)</span>
+              <input name="songRequest" maxlength="220" autocomplete="off" placeholder="Example: Happy Birthday song" />
+            </label>
+            <label>
+              <span>Announcement or message (optional)</span>
+              <input name="specialAnnouncement" maxlength="260" autocomplete="off" placeholder="Example: Please announce family photos after cake" />
+            </label>
+          </div>
+
+          <button id="add-planner-activity-btn" class="primary" type="submit">Add Activity</button>
+          <p id="planner-status" class="small muted" role="status"></p>
+        </form>
+
+        <section id="paste-planner-panel" class="form-stack planner-method-panel hidden" data-method-panel="paste">
+          <label>
+            <span>Paste program text</span>
+            <textarea id="paste-program-text" class="large-textarea" placeholder="Example:
+Guest arrival
+Welcome speech
+Cake cutting"></textarea>
+          </label>
+          <p class="small muted">Paste your schedule, notes, or program below. Put each activity on its own line. No times needed — just the activities in order.</p>
+          <button id="create-activities-from-text-btn" class="primary" type="button">Create Activities from Text</button>
+          <div id="paste-activity-drafts" class="entity-list paste-draft-list"></div>
+          <button id="submit-paste-activities-btn" class="primary hidden" type="button">Submit Activities</button>
+          <p id="paste-planner-status" class="small muted" role="status"></p>
+        </section>
+
+        <form id="upload-planner-form" class="form-stack planner-method-panel hidden" data-method-panel="upload">
+          <label>
+            <span>Upload program file</span>
+            <input id="program-file-input" name="programFile" type="file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx,.csv,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain" />
+          </label>
+          <label>
+            <span>Notes for the organizer (optional)</span>
+            <textarea name="clientNotes" maxlength="700" placeholder="Anything we should know about this file?"></textarea>
+          </label>
+          <p class="small muted">Accepted: PDF, DOC/DOCX, JPG/PNG, XLS/XLSX, CSV, TXT. Max file size: 10 MB.</p>
+          <button id="upload-program-file-btn" class="primary" type="submit">Upload File</button>
+          <p id="upload-planner-status" class="small muted" role="status"></p>
+        </form>
+
+        <div class="section-title compact-title">
+          <div>
+            <p class="section-kicker">Running Order</p>
+            <h3>Submitted Activities <span id="activity-count" class="activity-count-badge" aria-live="polite"></span></h3>
+          </div>
+        </div>
+        <div id="public-planner-list" class="entity-list public-planner-list"></div>
+      </section>
+    </main>
+
+    <script type="module" src="./planner.js"></script>
+  </body>
+</html>

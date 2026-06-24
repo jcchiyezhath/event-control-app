@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Event Control Web</title>
+    <title>Aviyal Event Hub</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -12,7 +12,8 @@
         <div class="topbar card">
           <div class="topbar-copy">
             <p class="eyebrow">Live show toolkit</p>
-            <h1>Event Control Web</h1>
+            <h1 id="app-name">Aviyal Event Hub</h1>
+            <p id="app-tagline" class="small muted">Event Planning & Operations Platform</p>
             <p id="page-subtitle" class="small muted">Live event control for phone and laptop.</p>
           </div>
           <div class="topbar-meta">
@@ -45,9 +46,12 @@
         <nav class="top-nav card" aria-label="Main tabs">
           <button class="tab-button active" data-tab="dashboard" type="button">Dashboard</button>
           <button class="tab-button" data-tab="program" type="button">Program</button>
+          <button class="tab-button" data-tab="program-planner" type="button">Program Planner</button>
           <button class="tab-button" data-tab="songs" type="button">Songs</button>
           <button class="tab-button" data-tab="checklist" type="button">Checklist</button>
           <button class="tab-button" data-tab="notes" type="button">Notes</button>
+          <button class="tab-button" data-tab="finance" type="button">Finance</button>
+          <button class="tab-button" data-tab="audio-tools" type="button">Audio Tools</button>
         </nav>
 
         <div id="mobile-nav-overlay" class="mobile-nav-overlay hidden" aria-hidden="true">
@@ -59,9 +63,12 @@
             <div class="mobile-nav-list">
               <button class="mobile-nav-link" data-tab="dashboard" type="button">Dashboard</button>
               <button class="mobile-nav-link" data-tab="program" type="button">Program</button>
+              <button class="mobile-nav-link" data-tab="program-planner" type="button">Program Planner</button>
               <button class="mobile-nav-link" data-tab="songs" type="button">Songs</button>
               <button class="mobile-nav-link" data-tab="checklist" type="button">Checklist</button>
               <button class="mobile-nav-link" data-tab="notes" type="button">Notes</button>
+              <button class="mobile-nav-link" data-tab="finance" type="button">Finance</button>
+              <button class="mobile-nav-link" data-tab="audio-tools" type="button">Audio Tools</button>
             </div>
           </div>
         </div>
@@ -130,10 +137,34 @@
             <article class="card stat-card feature-card">
               <p class="stat-label">Active Event</p>
               <strong id="dashboard-event-title">None</strong>
+              <div class="dashboard-event-meta" aria-label="Active event details">
+                <span id="dashboard-event-date">Date not set</span>
+                <span id="dashboard-event-type">Type not set</span>
+              </div>
+              <div class="dashboard-event-controls">
+                <div class="dashboard-event-selector-row">
+                  <label class="sr-only" for="event-selector">Change Event</label>
+                  <select id="event-selector" aria-label="Change Event">
+                    <option value="">No event selected</option>
+                  </select>
+                </div>
+                <div class="dashboard-event-btn-row">
+                  <button id="edit-event-btn" class="ghost" type="button">Event Settings</button>
+                  <button id="add-dj-template-btn" class="ghost" type="button">Add DJ Template</button>
+                  <button id="dashboard-new-event-btn" type="button">+ New Event</button>
+                </div>
+                <div class="dashboard-event-danger-row">
+                  <button id="delete-event-btn" class="danger" type="button">Delete Event</button>
+                </div>
+              </div>
             </article>
             <article class="card stat-card">
               <p class="stat-label">Program</p>
               <strong id="dashboard-program-count">0</strong>
+            </article>
+            <article class="card stat-card">
+              <p class="stat-label">Planner Activities</p>
+              <strong id="dashboard-planner-count">0</strong>
             </article>
             <article class="card stat-card">
               <p class="stat-label">Songs</p>
@@ -228,6 +259,68 @@
           </article>
         </section>
 
+        <section id="program-planner" class="page">
+          <article class="card section-shell planner-shell">
+            <div class="planner-link-panel list-card">
+              <div class="section-title compact-title">
+                <div>
+                  <p class="section-kicker">Client Planning</p>
+                  <h3>Program Planner</h3>
+                </div>
+                <span id="planner-count-badge" class="badge badge-muted">0 activities</span>
+              </div>
+              <div class="request-link-actions">
+                <button id="create-planner-link-btn" class="primary" type="button">Create Planner Link</button>
+                <button id="copy-planner-link-btn" type="button" disabled>Copy Link</button>
+                <button id="download-planner-qr-btn" type="button" disabled>Download QR Code</button>
+                <button id="open-planner-page-btn" type="button" disabled>Open Planner Page</button>
+              </div>
+              <div id="planner-link-panel" class="request-link-panel hidden">
+                <label>
+                  <span>Public planner link</span>
+                  <input id="planner-link-output" readonly />
+                </label>
+                <div class="qr-panel">
+                  <img id="planner-qr-code" alt="QR code for program planner link" />
+                </div>
+              </div>
+            </div>
+
+            <div class="planner-grid">
+              <section class="planner-column">
+                <div class="section-title compact-title">
+                  <div>
+                    <p class="section-kicker">Submitted Activities</p>
+                    <h3>Client Program</h3>
+                  </div>
+                </div>
+                <div id="planner-activities-list" class="entity-list planner-activity-list"></div>
+              </section>
+
+              <section class="planner-column">
+                <div class="section-title compact-title">
+                  <div>
+                    <p class="section-kicker">Suggested Flow</p>
+                    <h3>Event Timeline</h3>
+                  </div>
+                </div>
+                <div id="planner-timeline-list" class="entity-list"></div>
+              </section>
+            </div>
+
+            <section class="planner-column">
+              <div class="section-title compact-title">
+                <div>
+                  <p class="section-kicker">Client Submissions</p>
+                  <h3>Uploaded Files</h3>
+                </div>
+                <span id="planner-upload-count-badge" class="badge badge-muted">0 files</span>
+              </div>
+              <div id="planner-uploads-list" class="entity-list planner-uploads-list"></div>
+            </section>
+          </article>
+        </section>
+
         <section id="songs" class="page">
           <article class="card section-shell">
             <div class="section-title section-toolbar compact-title">
@@ -293,6 +386,160 @@
               </div>
             </div>
             <div id="notes-list" class="entity-list"></div>
+          </article>
+        </section>
+
+        <section id="finance" class="page">
+          <article class="card section-shell">
+            <div class="section-title section-toolbar compact-title">
+              <div>
+                <p class="section-kicker">Money</p>
+                <h3>Finance</h3>
+              </div>
+              <div class="toolbar-actions">
+                <select id="finance-year-filter" aria-label="Tax summary year">
+                  <option value="all">All years</option>
+                </select>
+                <button id="export-invoices-csv-btn" type="button">Export Invoices CSV</button>
+                <button id="export-expenses-csv-btn" type="button">Export Expenses CSV</button>
+              </div>
+            </div>
+
+            <div class="finance-summary-grid">
+              <article class="list-card finance-summary-card">
+                <span>Total Paid Income</span>
+                <strong id="finance-paid-income">$0.00</strong>
+              </article>
+              <article class="list-card finance-summary-card">
+                <span>Unpaid Invoices</span>
+                <strong id="finance-unpaid-invoices">$0.00</strong>
+              </article>
+              <article class="list-card finance-summary-card">
+                <span>Total Expenses</span>
+                <strong id="finance-total-expenses">$0.00</strong>
+              </article>
+              <article class="list-card finance-summary-card">
+                <span>Deductible Expenses</span>
+                <strong id="finance-deductible-expenses">$0.00</strong>
+              </article>
+              <article class="list-card finance-summary-card">
+                <span>Estimated Profit</span>
+                <strong id="finance-estimated-profit">$0.00</strong>
+              </article>
+            </div>
+
+            <section class="invoice-settings-panel list-card">
+              <div class="section-title compact-title finance-column-title">
+                <div>
+                  <p class="section-kicker">Invoice Settings</p>
+                  <h3>Defaults & Payment Details</h3>
+                </div>
+              </div>
+              <form id="invoice-settings-form" class="settings-form">
+                <div class="form-grid">
+                  <label>
+                    <span>Business Name</span>
+                    <input id="invoice-business-name" name="invoiceBusinessName" autocomplete="organization" />
+                  </label>
+                  <label>
+                    <span>Logo URL</span>
+                    <input id="invoice-logo-url" name="invoiceLogoUrl" placeholder="Logo upload placeholder" />
+                  </label>
+                  <label>
+                    <span>Default Tax Rate (%)</span>
+                    <input id="default-tax-rate" name="defaultTaxRate" type="number" min="0" step="0.001" />
+                  </label>
+                  <label>
+                    <span>Default Due Days</span>
+                    <input id="default-due-days" name="defaultDueDays" type="number" min="0" step="1" />
+                  </label>
+                  <label>
+                    <span>Zelle Email</span>
+                    <input id="zelle-email-setting" name="zelleEmail" type="email" />
+                  </label>
+                  <label>
+                    <span>Country / State Display</span>
+                    <input id="country-state-display" name="countryStateDisplay" placeholder="United States / New Jersey" />
+                  </label>
+                  <label class="toggle-row full-span">
+                    <input id="show-tax-on-invoice" name="showTaxOnInvoice" type="checkbox" />
+                    <span>Show tax on invoice</span>
+                  </label>
+                  <label class="full-span">
+                    <span>Payment Instructions</span>
+                    <textarea id="payment-instructions-setting" name="paymentInstructions"></textarea>
+                  </label>
+                  <label class="full-span">
+                    <span>Invoice Footer Message</span>
+                    <textarea id="invoice-footer-message" name="invoiceFooterMessage"></textarea>
+                  </label>
+                </div>
+                <div class="settings-actions">
+                  <p id="invoice-settings-status" class="small muted">Saved under users/{uid}/settings/invoice.</p>
+                  <button id="save-invoice-settings-btn" class="primary" type="submit">Save Invoice Settings</button>
+                </div>
+              </form>
+            </section>
+
+            <div class="finance-grid">
+              <section class="finance-column">
+                <div class="section-title compact-title finance-column-title">
+                  <div>
+                    <p class="section-kicker">Billing</p>
+                    <h3>Invoices</h3>
+                  </div>
+                  <button id="add-invoice-btn" class="primary" type="button">Add Invoice</button>
+                </div>
+                <div id="invoices-list" class="entity-list"></div>
+              </section>
+
+              <section class="finance-column">
+                <div class="section-title compact-title finance-column-title">
+                  <div>
+                    <p class="section-kicker">Costs</p>
+                    <h3>Expenses</h3>
+                  </div>
+                  <button id="add-expense-btn" class="primary" type="button">Add Expense</button>
+                </div>
+                <div id="expenses-list" class="entity-list"></div>
+              </section>
+            </div>
+          </article>
+        </section>
+
+        <section id="audio-tools" class="page">
+          <article class="card section-shell audio-tools-shell">
+            <div class="audio-tools-panel list-card">
+              <div class="section-title compact-title">
+                <div>
+                  <p class="section-kicker">Guest Requests</p>
+                  <h3>DJ Request List</h3>
+                </div>
+                <span id="request-count-badge" class="badge badge-muted">0 new</span>
+              </div>
+              <div class="request-link-actions">
+                <button id="create-request-link-btn" class="primary" type="button">Create Request Link</button>
+                <button id="copy-request-link-btn" type="button" disabled>Copy Link</button>
+                <button id="download-request-qr-btn" type="button" disabled>Download QR Code</button>
+                <button id="open-request-page-btn" type="button" disabled>Open Request Page</button>
+              </div>
+              <div id="request-link-panel" class="request-link-panel hidden">
+                <label>
+                  <span>Public request link</span>
+                  <input id="request-link-output" readonly />
+                </label>
+                <div class="qr-panel">
+                  <img id="request-qr-code" alt="QR code for song request link" />
+                </div>
+              </div>
+              <div id="song-requests-list" class="entity-list request-list"></div>
+            </div>
+            <div class="audio-tools-panel list-card">
+              <h2>Aviyal Audio Converter</h2>
+              <p class="audio-tools-subtitle">Convert your own audio/video files to MP3 or WAV</p>
+              <p class="audio-tools-notice">YouTube URL conversion is not supported. Upload-owned files only.</p>
+              <button type="button" disabled>Upload File Coming Soon</button>
+            </div>
           </article>
         </section>
       </main>

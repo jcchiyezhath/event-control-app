@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request a Song</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="request-page">
+    <main class="public-request-shell">
+      <section class="card public-request-card">
+        <div class="section-title compact-title">
+          <div>
+            <p class="section-kicker">DJ Request</p>
+            <h1>Request a Song</h1>
+            <p id="request-event-title" class="small muted">Loading event...</p>
+          </div>
+        </div>
+
+        <form id="song-request-form" class="form-stack">
+          <label>
+            <span>Song name</span>
+            <input name="songName" maxlength="140" required autocomplete="off" />
+          </label>
+
+          <label>
+            <span>Artist</span>
+            <input name="artist" maxlength="140" autocomplete="off" />
+          </label>
+
+          <label>
+            <span>YouTube / Spotify / Apple Music link</span>
+            <input name="link" type="url" maxlength="500" placeholder="https://" inputmode="url" />
+          </label>
+
+          <label>
+            <span>Guest name</span>
+            <input name="guestName" maxlength="120" autocomplete="name" />
+          </label>
+
+          <label>
+            <span>Dedication/message</span>
+            <textarea name="message" maxlength="500"></textarea>
+          </label>
+
+          <button id="submit-request-btn" class="primary" type="submit">Submit</button>
+          <p id="request-status" class="small muted" role="status"></p>
+        </form>
+
+        <div id="request-success" class="success-panel hidden" role="status">Request sent to the DJ</div>
+      </section>
+    </main>
+
+    <script type="module" src="./request.js"></script>
+  </body>
+</html>

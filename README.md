@@ -1,14 +1,20 @@
-# Dil Se Event Control
+# Aviyal Event Hub
 
 Simple mobile-friendly event control web app for rehearsals and live stage programs. It uses plain HTML, CSS, and JavaScript with Firebase Auth and Firestore for live sync between phone and laptop.
 
 ## File Structure
 
 ```text
-Event Sound Organizer/
+Aviyal Event Hub/
+├── app-config.js
 ├── app.js
 ├── firebase-config.js
+├── invoice.css
+├── invoice.html
+├── invoice.js
 ├── index.html
+├── request.html
+├── request.js
 ├── README.md
 └── styles.css
 ```
@@ -20,6 +26,7 @@ Event Sound Organizer/
 - Song Tracker with missing-song filter
 - Checklist grouped by category with incomplete filter
 - Notes / Live Issues with automatic timestamps
+- DJ Request List with public QR song request page
 - Backup / Emergency quick toggles
 - Sample starter data in every section
 - Responsive layout with desktop side navigation and mobile bottom navigation
@@ -31,7 +38,7 @@ Event Sound Organizer/
 3. In Firebase, enable:
    - `Authentication` -> `Email/Password`
    - `Firestore Database`
-4. Open [`firebase-config.js`](/Users/jc/Library/Mobile Documents/com~apple~CloudDocs/coding/Event Sound Organizer/firebase-config.js) and replace the placeholder values with your Firebase config.
+4. Open [`firebase-config.js`](/Users/jc/Library/Mobile Documents/com~apple~CloudDocs/coding/Aviyal Event Hub/firebase-config.js) and replace the placeholder values with your Firebase config.
 5. In Firestore rules, start with something like this while you test:
 
 ```text
@@ -40,6 +47,45 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /events/{eventId} {
+      allow read: if resource.data.requestLinkEnabled == true;
+      allow create: if request.auth != null
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if request.auth != null
+        && resource.data.ownerUid == request.auth.uid;
+
+      match /songRequests/{requestId} {
+        allow read, update, delete: if request.auth != null
+          && get(/databases/$(database)/documents/events/$(eventId)).data.ownerUid == request.auth.uid;
+        allow create: if get(/databases/$(database)/documents/events/$(eventId)).data.requestLinkEnabled == true
+          && request.resource.data.keys().hasOnly([
+            'songName',
+            'artist',
+            'link',
+            'guestName',
+            'message',
+            'status',
+            'submittedAt',
+            'createdAt'
+          ])
+          && request.resource.data.songName is string
+          && request.resource.data.songName.size() > 0
+          && request.resource.data.songName.size() <= 140
+          && request.resource.data.artist is string
+          && request.resource.data.artist.size() <= 140
+          && request.resource.data.link is string
+          && request.resource.data.link.size() <= 500
+          && request.resource.data.guestName is string
+          && request.resource.data.guestName.size() <= 120
+          && request.resource.data.message is string
+          && request.resource.data.message.size() <= 500
+          && request.resource.data.status == 'New';
+      }
     }
   }
 }
