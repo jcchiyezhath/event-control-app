@@ -109,6 +109,8 @@ document.addEventListener("DOMContentLoaded", () => {
     dragProgramId: null,
     dragPlannerActivityId: null,
     currentTab: "dashboard",
+    programView: "list",
+    eventFlowMode: "admin",
     mobileMenuOpen: false,
     detailsOpen: {
       program: {},
@@ -180,6 +182,18 @@ document.addEventListener("DOMContentLoaded", () => {
     quickAddChecklist: document.querySelector("#quick-add-checklist"),
     quickAddNote: document.querySelector("#quick-add-note"),
     programList: document.querySelector("#program-list"),
+    programListPanel: document.querySelector("#program-list-panel"),
+    eventFlowPanel: document.querySelector("#event-flow-panel"),
+    eventFlowList: document.querySelector("#event-flow-list"),
+    eventFlowTitle: document.querySelector("#event-flow-title"),
+    eventFlowDate: document.querySelector("#event-flow-date"),
+    programListViewBtn: document.querySelector("#program-list-view-btn"),
+    eventFlowViewBtn: document.querySelector("#event-flow-view-btn"),
+    printFlowBtn: document.querySelector("#print-flow-btn"),
+    downloadFlowPdfBtn: document.querySelector("#download-flow-pdf-btn"),
+    shareClientFlowBtn: document.querySelector("#share-client-flow-btn"),
+    adminFlowBtn: document.querySelector("#admin-flow-btn"),
+    clientFlowBtn: document.querySelector("#client-flow-btn"),
     songsList: document.querySelector("#songs-list"),
     checklistList: document.querySelector("#checklist-list"),
     notesList: document.querySelector("#notes-list"),
@@ -615,7 +629,7 @@ document.addEventListener("DOMContentLoaded", () => {
     elements.activeEventTitleInput.value = "";
     renderEventSelector();
     renderDashboard();
-    renderProgram();
+    renderProgramSurfaces();
     renderSongs();
     renderChecklist();
     renderNotes();
@@ -796,13 +810,14 @@ document.addEventListener("DOMContentLoaded", () => {
     renderDashboardSummary();
     renderRequestLink();
     renderPlannerLink();
+    renderEventFlow();
   }
 
   function getFilteredProgram() {
     return state.program.filter((item) => {
       const matchesStatus =
         state.filters.programStatus === "all" || item.status === state.filters.programStatus;
-      const haystack = `${item.title} ${item.type} ${item.audioFile || ""} ${item.cueNotes || ""} ${item.micNotes || ""}`
+      const haystack = `${item.title} ${item.type} ${item.audioFile || ""} ${item.time || ""} ${item.publicNotes || ""} ${item.internalNotes || ""} ${item.cueNotes || ""} ${item.micNotes || ""}`
         .toLowerCase();
       const matchesSearch = haystack.includes(state.filters.programSearch.toLowerCase());
       return matchesStatus && matchesSearch;
@@ -828,12 +843,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const linkedSong = state.songs.find((song) => song.linkedProgramId === item.id);
         const detailsOpen = isDetailsOpen("program", item.id);
         const menuOpen = isMenuOpen("program", item.id);
+        const orderPosition = getProgramPosition(item.id) || index + 1;
         return `
           <article class="entity-card program-card" draggable="true" data-program-id="${escapeHtml(item.id)}">
             <div class="card-main-row">
               <div class="entity-main-content">
                 <div class="entity-meta">
-                  <span class="program-order-badge" aria-label="Program order ${index + 1}">${index + 1}</span>
+                  <span class="program-order-badge" aria-label="Program order ${orderPosition}">${orderPosition}</span>
                   <span class="status-chip ${escapeHtml(item.status || "pending")}">${escapeHtml(item.status || "pending")}</span>
                   <span class="type-chip general">${escapeHtml(item.type || "other")}</span>
                 </div>
@@ -865,6 +881,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="card-details ${detailsOpen ? "" : "hidden"}">
               <div class="compact-grid">
                 <div class="list-card">
+                  <strong>Time</strong>
+                  <p class="small muted">${escapeHtml(getProgramTime(item) || "No time set")}</p>
+                </div>
+                <div class="list-card">
                   <strong>Audio File</strong>
                   <p class="small muted">${escapeHtml(item.audioFile || "No audio file assigned")}</p>
                 </div>
@@ -880,12 +900,148 @@ document.addEventListener("DOMContentLoaded", () => {
                 <strong>Mic Notes</strong>
                 <p class="small muted">${escapeHtml(item.micNotes || "None")}</p>
                 </div>
+                <div class="list-card">
+                <strong>Public Notes</strong>
+                <p class="small muted">${escapeHtml(item.publicNotes || "None")}</p>
+                </div>
+                <div class="list-card">
+                <strong>Internal Notes</strong>
+                <p class="small muted">${escapeHtml(item.internalNotes || "None")}</p>
+                </div>
               </div>
             </div>
           </article>
         `;
       })
       .join("");
+  }
+
+  function getProgramTime(item) {
+    return String(item.time || item.startTime || item.scheduledTime || "").trim();
+  }
+
+  function getProgramSongName(item) {
+    const linkedSong = state.songs.find((song) => song.linkedProgramId === item.id);
+    return String(
+      item.audioFile ||
+        linkedSong?.performanceTitle ||
+        linkedSong?.songName ||
+        linkedSong?.fileName ||
+        ""
+    ).trim();
+  }
+
+  function getProgramPeople(item) {
+    const linkedSong = state.songs.find((song) => song.linkedProgramId === item.id);
+    return String(
+      item.involved ||
+        item.people ||
+        item.performers ||
+        item.performer ||
+        linkedSong?.performer ||
+        ""
+    ).trim();
+  }
+
+  function eventDateLabel() {
+    return state.activeEvent?.eventDate ? formatDate(state.activeEvent.eventDate) : "Date not set";
+  }
+
+  function flowDetail(label, value, className = "") {
+    const text = String(value || "").trim();
+    if (!text) return "";
+    return `
+      <div class="flow-detail ${className}">
+        <span>${escapeHtml(label)}</span>
+        <strong>${escapeHtml(text)}</strong>
+      </div>
+    `;
+  }
+
+  function renderEventFlow() {
+    if (!elements.eventFlowList) return;
+
+    elements.eventFlowTitle.textContent = state.activeEvent?.title || "Event Flow";
+    elements.eventFlowDate.textContent = eventDateLabel();
+    elements.eventFlowPanel.classList.toggle("client-flow", state.eventFlowMode === "client");
+    elements.eventFlowPanel.classList.toggle("admin-flow", state.eventFlowMode === "admin");
+    elements.adminFlowBtn.classList.toggle("active", state.eventFlowMode === "admin");
+    elements.clientFlowBtn.classList.toggle("active", state.eventFlowMode === "client");
+
+    if (!state.user || !state.activeEventId) {
+      elements.eventFlowList.innerHTML = '<div class="empty-state">Sign in to load your event flow.</div>';
+      return;
+    }
+
+    const items = getOrderedProgramItems();
+    if (!items.length) {
+      elements.eventFlowList.innerHTML =
+        '<div class="empty-state">No program items yet. Add items in Program List to build this flow.</div>';
+      return;
+    }
+
+    elements.eventFlowList.innerHTML = items
+      .map((item, index) => {
+        const orderPosition = index + 1;
+        const time = getProgramTime(item);
+        const songName = getProgramSongName(item);
+        const people = getProgramPeople(item);
+        const publicNotes = String(item.publicNotes || item.clientNotes || "").trim();
+        const type = item.type || "other";
+        const adminDetails = [
+          flowDetail("Time", time || "Time not set"),
+          flowDetail("Category", type),
+          flowDetail("Song / Audio", songName || "No audio assigned"),
+          flowDetail("Mic notes", item.micNotes || "None", "admin-only"),
+          flowDetail("DJ cue notes", item.cueNotes || "None", "admin-only"),
+          flowDetail("Status", item.status || "pending", "admin-only"),
+          flowDetail("Internal notes", item.internalNotes || "", "admin-only"),
+          flowDetail("Public notes", publicNotes || ""),
+        ].join("");
+        const clientDetails = [
+          flowDetail("Time", time || "Time not set"),
+          flowDetail("Song / Audio", songName),
+          flowDetail("Involved", people),
+          flowDetail("Notes", publicNotes),
+        ].join("");
+
+        return `
+          <article class="event-flow-card">
+            <div class="flow-card-number" aria-label="Program number ${orderPosition}">${orderPosition}</div>
+            <div class="flow-card-body">
+              <div class="flow-card-topline">
+                <span>${escapeHtml(time || `Item ${orderPosition}`)}</span>
+                <span class="type-chip general">${escapeHtml(type)}</span>
+              </div>
+              <h4>${escapeHtml(item.title || "Untitled program item")}</h4>
+              <div class="flow-card-details">
+                ${state.eventFlowMode === "client" ? clientDetails : adminDetails}
+              </div>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
+  function renderProgramSurfaces() {
+    renderProgram();
+    renderEventFlow();
+  }
+
+  function setProgramView(view) {
+    state.programView = view === "flow" ? "flow" : "list";
+    const isFlow = state.programView === "flow";
+    elements.programListPanel.classList.toggle("hidden", isFlow);
+    elements.eventFlowPanel.classList.toggle("hidden", !isFlow);
+    elements.programListViewBtn.classList.toggle("active", !isFlow);
+    elements.eventFlowViewBtn.classList.toggle("active", isFlow);
+    if (isFlow) renderEventFlow();
+  }
+
+  function setEventFlowMode(mode) {
+    state.eventFlowMode = mode === "client" ? "client" : "admin";
+    renderEventFlow();
   }
 
   function getFilteredSongs() {
@@ -1831,8 +1987,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (entity === "program") {
       const programItem = item || {};
+      const currentProgramPosition = mode === "edit" ? getProgramPosition(programItem.id) : state.program.length + 1;
+      const totalProgramCount = mode === "edit" ? state.program.length : state.program.length + 1;
       fieldsMarkup = `
         <div class="form-grid">
+          ${mode === "edit" ? `
+          <div class="program-order-control full-span">
+            <label>
+              <span>Program Order</span>
+              <input name="programOrder" type="number" inputmode="numeric" min="1" max="${totalProgramCount}" step="1" value="${currentProgramPosition}" placeholder="1, 2, 3, etc." />
+            </label>
+            <div class="program-order-actions" aria-label="Program order quick controls">
+              <button type="button" data-action="modal-program-up">Move Up</button>
+              <button type="button" data-action="modal-program-down">Move Down</button>
+            </div>
+          </div>
+          ` : ""}
           <label>
             <span>Title</span>
             <input name="title" value="${escapeHtml(programItem.title || "")}" required />
@@ -1848,6 +2018,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <label>
             <span>Audio File</span>
             <input name="audioFile" value="${escapeHtml(programItem.audioFile || "")}" />
+          </label>
+          <label>
+            <span>Time</span>
+            <input name="time" value="${escapeHtml(programItem.time || programItem.startTime || "")}" placeholder="Example: 7:15 PM" />
           </label>
           <label>
             <span>Status</span>
@@ -1868,6 +2042,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <label class="full-span">
             <span>Mic Notes</span>
             <textarea name="micNotes">${escapeHtml(programItem.micNotes || "")}</textarea>
+          </label>
+          <label class="full-span">
+            <span>Public Notes</span>
+            <textarea name="publicNotes">${escapeHtml(programItem.publicNotes || "")}</textarea>
+          </label>
+          <label class="full-span">
+            <span>Internal Notes</span>
+            <textarea name="internalNotes">${escapeHtml(programItem.internalNotes || "")}</textarea>
           </label>
         </div>
       `;
@@ -2317,6 +2499,54 @@ document.addEventListener("DOMContentLoaded", () => {
     return Math.max(...state.program.map((item) => Number(item.order || 0))) + 1;
   }
 
+  function getOrderedProgramItems() {
+    return state.program
+      .map((item, index) => ({ item, index }))
+      .sort((a, b) => {
+        const orderDiff = Number(a.item.order || 0) - Number(b.item.order || 0);
+        return orderDiff || a.index - b.index;
+      })
+      .map(({ item }) => item);
+  }
+
+  function getProgramPosition(itemId) {
+    const index = getOrderedProgramItems().findIndex((item) => item.id === itemId);
+    return index >= 0 ? index + 1 : state.program.length + 1;
+  }
+
+  function getClampedProgramOrder(rawValue, total, fallback) {
+    const value = String(rawValue || "").trim();
+    if (!value) return fallback;
+    const parsed = Number.parseInt(value, 10);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.min(Math.max(parsed, 1), total);
+  }
+
+  async function updateProgramItemWithOrder(itemId, payload, requestedOrderRaw) {
+    if (!state.user || !state.activeEventId || !itemId) return;
+
+    const items = getOrderedProgramItems();
+    const currentIndex = items.findIndex((item) => item.id === itemId);
+    if (currentIndex < 0) {
+      await updateDoc(doc(collectionRef(state.user.uid, state.activeEventId, "program"), itemId), payload);
+      return;
+    }
+
+    const requestedPosition = getClampedProgramOrder(requestedOrderRaw, items.length, currentIndex + 1);
+    const [movedItem] = items.splice(currentIndex, 1);
+    items.splice(requestedPosition - 1, 0, movedItem);
+
+    const batch = writeBatch(db);
+    items.forEach((item, index) => {
+      batch.update(doc(collectionRef(state.user.uid, state.activeEventId, "program"), item.id), {
+        ...(item.id === itemId ? payload : {}),
+        order: index + 1,
+        updatedAt: serverTimestamp(),
+      });
+    });
+    await batch.commit();
+  }
+
   function programPayloadFromPlannerActivity(item = {}) {
     const cueNotes = [
       item.notes ? `Special instructions: ${item.notes}` : "",
@@ -2634,14 +2864,17 @@ document.addEventListener("DOMContentLoaded", () => {
       "program",
       query(collectionRef(user.uid, activeEventId, "program"), orderBy("order", "asc")),
       (docSnapshot) => ({ id: docSnapshot.id, ...docSnapshot.data() }),
-      renderProgram
+      renderProgramSurfaces
     );
 
     subscribeToCollection(
       "songs",
       query(collectionRef(user.uid, activeEventId, "songs"), orderBy("updatedAt", "desc")),
       (docSnapshot) => ({ id: docSnapshot.id, ...docSnapshot.data() }),
-      renderSongs
+      () => {
+        renderSongs();
+        renderEventFlow();
+      }
     );
 
     subscribeToCollection(
@@ -2880,15 +3113,18 @@ document.addEventListener("DOMContentLoaded", () => {
           title: String(formData.get("title") || "").trim(),
           type: String(formData.get("type") || "other"),
           audioFile: String(formData.get("audioFile") || "").trim(),
+          time: String(formData.get("time") || "").trim(),
           cueNotes: String(formData.get("cueNotes") || "").trim(),
           micNotes: String(formData.get("micNotes") || "").trim(),
+          publicNotes: String(formData.get("publicNotes") || "").trim(),
+          internalNotes: String(formData.get("internalNotes") || "").trim(),
           status: String(formData.get("status") || "pending"),
           duration: String(formData.get("duration") || "").trim(),
           updatedAt: serverTimestamp(),
         };
 
         if (mode === "edit") {
-          await updateDoc(doc(collectionRef(uid, eventId, "program"), itemId), payload);
+          await updateProgramItemWithOrder(itemId, payload, formData.get("programOrder"));
         } else {
           await addDoc(collectionRef(uid, eventId, "program"), {
             ...payload,
@@ -3353,7 +3589,7 @@ Contact:
   async function ensureProgramPlannerLink() {
     if (!state.user || !state.activeEventId) {
       showToast("Select an event first", "error");
-      return;
+      return "";
     }
 
     try {
@@ -3389,8 +3625,10 @@ Contact:
       };
       renderPlanner();
       showToast("Planner link ready", "success");
+      return currentPlannerLink();
     } catch (error) {
       showToast(mapFirebaseError(error), "error");
+      return "";
     }
   }
 
@@ -3416,6 +3654,36 @@ Contact:
     const link = currentPlannerLink();
     if (!link) return;
     window.open(link, "_blank", "noopener,noreferrer");
+  }
+
+  function printEventFlow() {
+    setProgramView("flow");
+    document.body.classList.add("printing-event-flow");
+    window.setTimeout(() => window.print(), 80);
+  }
+
+  async function shareClientFlow() {
+    setProgramView("flow");
+    setEventFlowMode("client");
+    const link = currentPlannerLink() || (await ensureProgramPlannerLink());
+    if (!link) return;
+
+    const shareData = {
+      title: `${state.activeEvent?.title || "Event"} client view`,
+      text: "Client-friendly program view from Aviyal Event Hub.",
+      url: link,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+      }
+    }
+
+    await copyTextToClipboard(link, "Client view link copied");
   }
 
   async function downloadRequestQrCode() {
@@ -3666,7 +3934,7 @@ Contact:
     try {
       if (action === "toggle-details") {
         toggleDetails(extra, id);
-        if (extra === "program") renderProgram();
+        if (extra === "program") renderProgramSurfaces();
         if (extra === "songs") renderSongs();
         if (extra === "invoices" || extra === "expenses") renderFinance();
         return;
@@ -3674,7 +3942,7 @@ Contact:
 
       if (action === "toggle-menu") {
         toggleMenu(extra, id);
-        if (extra === "program") renderProgram();
+        if (extra === "program") renderProgramSurfaces();
         if (extra === "songs") renderSongs();
         if (extra === "checklist") renderChecklist();
         if (extra === "notes") renderNotes();
@@ -4057,6 +4325,13 @@ Contact:
     elements.copyPlannerLinkBtn.addEventListener("click", copyPlannerLink);
     elements.downloadPlannerQrBtn.addEventListener("click", downloadPlannerQrCode);
     elements.openPlannerPageBtn.addEventListener("click", openPlannerPage);
+    elements.programListViewBtn.addEventListener("click", () => setProgramView("list"));
+    elements.eventFlowViewBtn.addEventListener("click", () => setProgramView("flow"));
+    elements.adminFlowBtn.addEventListener("click", () => setEventFlowMode("admin"));
+    elements.clientFlowBtn.addEventListener("click", () => setEventFlowMode("client"));
+    elements.printFlowBtn.addEventListener("click", printEventFlow);
+    elements.downloadFlowPdfBtn.addEventListener("click", printEventFlow);
+    elements.shareClientFlowBtn.addEventListener("click", shareClientFlow);
   }
 
   function bindFilters() {
@@ -4268,10 +4543,20 @@ Contact:
     });
     elements.itemForm.addEventListener("submit", saveFormSubmission);
     elements.itemForm.addEventListener("click", (event) => {
-      if (event.target.id === "modal-cancel-btn") closeModal();
-      if (event.target.dataset.action === "add-line-item") addInvoiceLineItemRow();
-      if (event.target.dataset.action === "remove-line-item") {
-        const row = event.target.closest("[data-line-item-row]");
+      const button = event.target.closest("button");
+      if (!button) return;
+      if (button.id === "modal-cancel-btn") closeModal();
+      if (button.dataset.action === "modal-program-up" || button.dataset.action === "modal-program-down") {
+        const orderInput = elements.itemForm.querySelector('[name="programOrder"]');
+        if (!orderInput) return;
+        const currentValue = Number.parseInt(orderInput.value || orderInput.placeholder || "1", 10) || 1;
+        const maxValue = Number.parseInt(orderInput.max || String(state.program.length || 1), 10) || 1;
+        const nextValue = button.dataset.action === "modal-program-up" ? currentValue - 1 : currentValue + 1;
+        orderInput.value = String(Math.min(Math.max(nextValue, 1), maxValue));
+      }
+      if (button.dataset.action === "add-line-item") addInvoiceLineItemRow();
+      if (button.dataset.action === "remove-line-item") {
+        const row = button.closest("[data-line-item-row]");
         const rows = elements.itemForm.querySelectorAll("[data-line-item-row]");
         if (row && rows.length > 1) row.remove();
         refreshInvoiceModalCalculations();
@@ -4296,7 +4581,7 @@ Contact:
         if (state.mobileMenuOpen) closeMobileMenu();
         if (state.openMenu.id) {
           closeOpenMenu();
-          renderProgram();
+          renderProgramSurfaces();
           renderSongs();
           renderChecklist();
           renderNotes();
@@ -4309,13 +4594,16 @@ Contact:
         const hadOpenMenu = Boolean(state.openMenu.id);
         if (hadOpenMenu) {
           closeOpenMenu();
-          renderProgram();
+          renderProgramSurfaces();
           renderSongs();
           renderChecklist();
           renderNotes();
           renderFinance();
         }
       }
+    });
+    window.addEventListener("afterprint", () => {
+      document.body.classList.remove("printing-event-flow");
     });
   }
 
@@ -4407,7 +4695,7 @@ Contact:
   bindEvents();
   switchTab("dashboard");
   setSignedOutUi();
-  renderProgram();
+  renderProgramSurfaces();
   renderSongs();
   renderChecklist();
   renderNotes();

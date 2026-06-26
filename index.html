@@ -244,6 +244,11 @@
                 <h3>Program</h3>
               </div>
               <div class="toolbar-actions">
+                <button id="program-list-view-btn" class="view-toggle active" type="button">Program List</button>
+                <button id="event-flow-view-btn" class="view-toggle" type="button">Event Flow</button>
+                <button id="print-flow-btn" class="ghost" type="button">Print Flow</button>
+                <button id="download-flow-pdf-btn" class="ghost" type="button">Download PDF</button>
+                <button id="share-client-flow-btn" class="ghost" type="button">Share Client View</button>
                 <input id="program-search" type="search" placeholder="Search program" />
                 <select id="program-filter">
                   <option value="all">All statuses</option>
@@ -255,7 +260,24 @@
                 <button id="add-program-btn" class="primary" type="button">Add Program Item</button>
               </div>
             </div>
-            <div id="program-list" class="entity-list"></div>
+            <div id="program-list-panel">
+              <div id="program-list" class="entity-list"></div>
+            </div>
+            <div id="event-flow-panel" class="event-flow-panel hidden">
+              <div class="event-flow-header">
+                <div>
+                  <p class="section-kicker">Event Flow</p>
+                  <h3 id="event-flow-title">Event Flow</h3>
+                  <p id="event-flow-date" class="small muted">Date not set</p>
+                </div>
+                <div class="flow-mode-toggle" aria-label="Event flow detail level">
+                  <button id="admin-flow-btn" class="view-toggle active" type="button">Admin</button>
+                  <button id="client-flow-btn" class="view-toggle" type="button">Client</button>
+                </div>
+              </div>
+              <div class="print-brand">Aviyal Event Hub</div>
+              <div id="event-flow-list" class="event-flow-list"></div>
+            </div>
           </article>
         </section>
 

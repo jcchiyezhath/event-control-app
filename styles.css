@@ -897,6 +897,168 @@ body:has(#mobile-nav-overlay:not(.hidden)) .app-header {
   flex: 1 1 170px;
 }
 
+.view-toggle {
+  background: var(--panel-soft);
+  box-shadow: none;
+}
+
+.view-toggle.active {
+  border-color: rgba(38, 103, 255, 0.35);
+  background: var(--primary-soft);
+  color: var(--primary-strong);
+}
+
+.event-flow-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.event-flow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel-soft);
+}
+
+.flow-mode-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.flow-mode-toggle button {
+  min-height: 40px;
+  padding: 0.55rem 0.85rem;
+}
+
+.print-brand {
+  display: none;
+  font-weight: 800;
+  color: var(--primary-strong);
+}
+
+.event-flow-list {
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding-left: 0.45rem;
+}
+
+.event-flow-list::before {
+  content: "";
+  position: absolute;
+  top: 1.2rem;
+  bottom: 1.2rem;
+  left: 1.65rem;
+  width: 2px;
+  background: var(--border-strong);
+}
+
+.event-flow-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  gap: 0.9rem;
+  padding-bottom: 1rem;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.event-flow-card:not(:last-child)::after {
+  content: "↓";
+  position: absolute;
+  left: 1.05rem;
+  bottom: -0.25rem;
+  z-index: 2;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--primary-strong);
+  font-size: 0.8rem;
+  line-height: 1.15rem;
+  text-align: center;
+}
+
+.flow-card-number {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: var(--shadow-soft);
+}
+
+.flow-card-body {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgba(219, 228, 238, 0.95);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+}
+
+.flow-card-topline,
+.flow-card-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.flow-card-topline {
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.flow-card-details {
+  align-items: stretch;
+}
+
+.flow-detail {
+  min-width: min(100%, 150px);
+  flex: 1 1 150px;
+  padding: 0.72rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel-soft);
+}
+
+.flow-detail span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.flow-detail strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.client-flow .admin-only {
+  display: none;
+}
+
 .event-status {
   padding: 0.9rem;
   border-radius: 16px;
@@ -1658,6 +1820,25 @@ body:has(#mobile-nav-overlay:not(.hidden)) .app-header {
   grid-column: 1 / -1;
 }
 
+.program-order-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.75rem;
+}
+
+.program-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-bottom: 0.05rem;
+}
+
+.program-order-actions button {
+  min-height: 44px;
+}
+
 .toggle-row {
   display: flex;
   align-items: center;
@@ -1951,6 +2132,19 @@ body:has(#sign-out-btn:not(.hidden)) .topbar-copy h1 {
     grid-template-columns: 1fr;
   }
 
+  .program-order-control {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .program-order-actions {
+    justify-content: stretch;
+  }
+
+  .program-order-actions button {
+    flex: 1 1 140px;
+  }
+
   .line-item-fields,
   .invoice-calculation-panel {
     grid-template-columns: 1fr;
@@ -2183,5 +2377,141 @@ body:has(#sign-out-btn:not(.hidden)) .topbar-copy h1 {
   .finance-summary-grid,
   .finance-card .compact-grid {
     grid-template-columns: 1fr;
+  }
+
+  .event-flow-header {
+    display: grid;
+  }
+
+  .flow-mode-toggle {
+    justify-content: stretch;
+  }
+
+  .flow-mode-toggle button {
+    flex: 1 1 120px;
+  }
+
+  .event-flow-list {
+    padding-left: 0;
+  }
+
+  .event-flow-list::before {
+    left: 1.15rem;
+  }
+
+  .event-flow-card {
+    grid-template-columns: 2.1rem minmax(0, 1fr);
+    gap: 0.65rem;
+  }
+
+  .flow-card-number {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .event-flow-card:not(:last-child)::after {
+    left: 0.7rem;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0.55in;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #111827;
+  }
+
+  body.printing-event-flow .app-header,
+  body.printing-event-flow .utility-grid,
+  body.printing-event-flow .top-nav,
+  body.printing-event-flow #dashboard,
+  body.printing-event-flow #program-planner,
+  body.printing-event-flow #songs,
+  body.printing-event-flow #checklist,
+  body.printing-event-flow #notes,
+  body.printing-event-flow #finance,
+  body.printing-event-flow #audio-tools,
+  body.printing-event-flow #program-list-panel,
+  body.printing-event-flow .toolbar-actions,
+  body.printing-event-flow .flow-mode-toggle,
+  body.printing-event-flow .toast-container,
+  body.printing-event-flow .modal-overlay {
+    display: none !important;
+  }
+
+  body.printing-event-flow .app-shell,
+  body.printing-event-flow .main-panel,
+  body.printing-event-flow .section-shell,
+  body.printing-event-flow #program,
+  body.printing-event-flow #event-flow-panel {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  body.printing-event-flow .section-title {
+    display: none !important;
+  }
+
+  body.printing-event-flow .event-flow-header {
+    display: block;
+    margin-bottom: 0.25in;
+    padding: 0 0 0.15in;
+    border: 0;
+    border-bottom: 1px solid #d1d5db;
+    border-radius: 0;
+    background: #fff;
+  }
+
+  body.printing-event-flow .event-flow-header h3 {
+    font-size: 18pt;
+  }
+
+  body.printing-event-flow .print-brand {
+    display: block;
+    margin-bottom: 0.18in;
+    font-size: 10pt;
+    letter-spacing: 0;
+  }
+
+  body.printing-event-flow .event-flow-list {
+    padding-left: 0;
+  }
+
+  body.printing-event-flow .event-flow-list::before {
+    background: #9ca3af;
+  }
+
+  body.printing-event-flow .event-flow-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body.printing-event-flow .flow-card-number {
+    border-color: #fff;
+    background: #111827 !important;
+    color: #fff !important;
+    box-shadow: none;
+  }
+
+  body.printing-event-flow .flow-card-body {
+    border-color: #d1d5db;
+    border-radius: 8px;
+    box-shadow: none;
+  }
+
+  body.printing-event-flow .flow-detail {
+    border-color: #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
   }
 }
